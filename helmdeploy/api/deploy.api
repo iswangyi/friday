@@ -1,0 +1,52 @@
+type (
+	addReq {
+		Book  string `form:"book"`
+		Price int64  `form:"price"`
+	}
+
+	addResp {
+		Ok bool `json:"ok"`
+	}
+)
+
+type (
+	checkReq {
+		Book string `form:"book"`
+	}
+
+	checkResp {
+		Found bool  `json:"found"`
+		Price int64 `json:"price"`
+	}
+)
+type (
+	HelmListReq {
+		Release string `form:"release"`
+	}
+
+	HelmListResp {
+		ReleaseCount int              `json:"releaseCount"`
+		Release      []*HelmListsResp `json:"release"`
+	}
+
+	HelmListsResp {
+		ReleaseName string `json:"release"`
+		NameSpace   string `json:"nameSpace"`
+		Revison     string `json:"revison"`
+		UpDate      string `json:"upDate"`
+		Status      string `json:"status"`
+		Chart       string `json:"chart"`
+	}
+)
+
+service deploy-api {
+	@handler AddHandler
+	get /add (addReq) returns (addResp)
+	
+	@handler CheckHandler
+	get /check (checkReq) returns (checkResp)
+	
+	//查询helm            helm ls
+	@handler GetHelmListHandler
+	get /helmlist (HelmListReq) returns (HelmListResp)
+}
