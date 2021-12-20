@@ -22,6 +22,7 @@ type (
 type (
 	HelmListReq {
 		Release string `form:"release"`
+		NameSpace string  `form:"nameSpace"`
 	}
 
 	HelmListResp {
@@ -49,4 +50,6 @@ service deploy-api {
 	//查询helm            helm ls
 	@handler GetHelmListHandler
 	get /helmlist (HelmListReq) returns (HelmListResp)
+
+	//更新helm         helm update
 }

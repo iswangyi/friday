@@ -30,6 +30,7 @@ func (l *GetHelmListLogic) GetHelmList(req types.HelmListReq) (resp *types.HelmL
 	client := l.svcCtx.List
 	client.AllNamespaces = true
 	//根据release 过滤结果
+
 	client.Filter = req.Release
 	client.SetStateMask()
 	results, err := client.Run()
