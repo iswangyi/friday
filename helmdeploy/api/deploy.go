@@ -24,6 +24,7 @@ func main() {
 	conf.MustLoad(*configFile, &c)
 
 	ctx := svc.NewServiceContext(c)
+
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 

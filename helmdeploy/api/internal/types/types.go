@@ -20,7 +20,8 @@ type CheckResp struct {
 }
 
 type HelmListReq struct {
-	Release string `form:"release"`
+	Release   string `form:"release"`
+	NameSpace string `form:"nameSpace"`
 }
 
 type HelmListResp struct {
@@ -35,4 +36,15 @@ type HelmListsResp struct {
 	UpDate      string `json:"upDate"`
 	Status      string `json:"status"`
 	Chart       string `json:"chart"`
+	Image       string `json:"image"`
+}
+
+type HelmUpdateReq struct {
+	ReleaseName string `form:"release"`
+	NameSpace   string `form:"nameSpace"`
+	ImageName   string `form:"imageName"`
+}
+
+type HelmUpdateResp struct {
+	UpdateResult bool `json:"updateResult"`
 }

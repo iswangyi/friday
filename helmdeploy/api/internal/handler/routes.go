@@ -27,6 +27,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/helmlist",
 				Handler: GetHelmListHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/updatehelmrelease",
+				Handler: UpdateHelmReleaseHandler(serverCtx),
+			},
 		},
 	)
 }

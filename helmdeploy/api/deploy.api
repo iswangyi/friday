@@ -21,8 +21,8 @@ type (
 )
 type (
 	HelmListReq {
-		Release string `form:"release"`
-		NameSpace string  `form:"nameSpace"`
+		Release   string `form:"release"`
+		NameSpace string `form:"nameSpace"`
 	}
 
 	HelmListResp {
@@ -37,6 +37,17 @@ type (
 		UpDate      string `json:"upDate"`
 		Status      string `json:"status"`
 		Chart       string `json:"chart"`
+		Image       string `json:"image"`
+	}
+
+	HelmUpdateReq {
+		ReleaseName string `form:"release"`
+		NameSpace   string `form:"nameSpace"`
+		ImageName   string `form:"imageName"`
+	}
+
+	HelmUpdateResp {
+		UpdateResult bool `json:"updateResult"`
 	}
 )
 
@@ -50,6 +61,8 @@ service deploy-api {
 	//查询helm            helm ls
 	@handler GetHelmListHandler
 	get /helmlist (HelmListReq) returns (HelmListResp)
-
+	
 	//更新helm         helm update
+	@handler UpdateHelmReleaseHandler
+	post /updatehelmrelease (HelmListReq) returns (HelmListResp)
 }

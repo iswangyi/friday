@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"log"
@@ -13,10 +14,16 @@ func main() {
 	actionConfig := new(action.Configuration)
 	// You can pass an empty string instead of settings.Namespace() to list
 	// all namespaces
-	if err := actionConfig.Init(settings.RESTClientGetter(), settings.Namespace(), os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
+	if err := actionConfig.Init(settings.RESTClientGetter(), "test", os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
 		log.Printf("%+v", err)
 		os.Exit(1)
 	}
+	status := action.NewStatus(actionConfig)
+	t, err := status.Run("front-bestqian")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(t.Name)
 
 	client := action.NewList(actionConfig)
 	// Only list deployed

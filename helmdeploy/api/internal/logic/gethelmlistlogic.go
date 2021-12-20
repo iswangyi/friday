@@ -6,9 +6,14 @@ import (
 	"friday/common/errorx"
 	"friday/helmdeploy/api/internal/svc"
 	"friday/helmdeploy/api/internal/types"
-	"strconv"
-
 	"github.com/tal-tech/go-zero/core/logx"
+	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/release"
+	"log"
+	"os"
+	"strconv"
+	"strings"
 )
 
 type GetHelmListLogic struct {
@@ -26,18 +31,25 @@ func NewGetHelmListLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetHel
 }
 
 func (l *GetHelmListLogic) GetHelmList(req types.HelmListReq) (resp *types.HelmListResp, err error) {
+	s := cli.New()
+	var namespace string
+	if req.NameSpace == "" {
+		namespace = "default"
+	} else {
+		namespace = req.NameSpace
+	}
 
-	client := l.svcCtx.List
-	client.AllNamespaces = true
-	//根据release 过滤结果
+	if err := l.svcCtx.Configuration.Init(s.RESTClientGetter(), namespace, os.Getenv("HELM_DRIVER"), log.Printf); err != nil {
+		logx.Info("helm load config error", err)
+		return nil, err
+	}
+	client := action.NewList(l.svcCtx.Configuration)
+	client.Deployed = true
 
 	client.Filter = req.Release
 	client.SetStateMask()
-	results, err := client.Run()
 
-	for _, j := range results {
-		fmt.Printf("%v", j)
-	}
+	results, err := client.Run()
 
 	if err != nil {
 		logx.Info("helm list error ", err)
@@ -60,6 +72,7 @@ func (l *GetHelmListLogic) GetHelmList(req types.HelmListReq) (resp *types.HelmL
 			UpDate:      v.Info.LastDeployed.String(),
 			Status:      v.Info.Status.String(),
 			Chart:       v.Info.Description,
+			Image:       getImages(v),
 		}
 		releaseInfo = append(releaseInfo, &t)
 	}
@@ -68,4 +81,19 @@ func (l *GetHelmListLogic) GetHelmList(req types.HelmListReq) (resp *types.HelmL
 		Release:      releaseInfo,
 		ReleaseCount: len(releaseInfo),
 	}, nil
+
+}
+
+func getImages(release *release.Release) string {
+	s := release.Manifest
+	images := strings.Split(s, "image")
+
+	for _, v := range images {
+		fmt.Println(v)
+		if strings.Contains(v, "image") {
+			return v
+		}
+	}
+
+	return ""
 }
