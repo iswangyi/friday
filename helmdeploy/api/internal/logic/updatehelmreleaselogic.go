@@ -2,10 +2,11 @@ package logic
 
 import (
 	"context"
+	"fmt"
 	"friday/helmdeploy/api/internal/svc"
 	"friday/helmdeploy/api/internal/types"
 	"helm.sh/helm/v3/pkg/action"
-	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
 	"log"
 	"os"
@@ -40,10 +41,37 @@ func (l *UpdateHelmReleaseLogic) UpdateHelmRelease(req types.HelmListReq) (resp 
 		logx.Info("helm load config error", err)
 		return nil, err
 	}
+	chart,err := loader.Loader("/Users/zhengjunxiong/helmtemp/nginx-x")
+	c,err := chart.Load()
 
-	client := action.NewUpgrade(l.svcCtx.Configuration)
-	client.Namespace = namespace
-	chart.Chart{}
+	if err != nil {
+		logx.Info(err)
+	}
 
-	return
+	upgrade := action.NewUpgrade(l.svcCtx.Configuration)
+	upgrade.Namespace = namespace
+
+	for k,v := range c.Values{
+		fmt.Println(k,"=",v)
+	}
+
+
+
+
+	service = map[port:80 type:ClusterIP]
+
+
+	r,err :=upgrade.Run(req.Release,c, map[string]interface{}{
+		"service" : map[string]interface{["port"]=81,["type"]="nodePort")},
+	})
+
+
+	if err != nil {
+		logx.Info("乱七八槽的错误",err)
+	}
+
+	fmt.Println(r.Manifest)
+
+
+	return nil,nil
 }
